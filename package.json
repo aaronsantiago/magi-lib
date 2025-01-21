@@ -1,0 +1,12 @@
+{
+  "name": "magi-lib",
+  "version": "1.0.0",
+  "description": "A library to interface with Rivet graphs with complex dependencies and scripting",
+  "main": "./magiRuntime.js",
+  "type": "module",
+  "dependencies": {
+    "@ironclad/rivet-node": "^1.19.1",
+    "chokidar": "^3.6.0",
+    "fengari": "^0.1.4"
+  }
+}
