@@ -3,6 +3,16 @@ use `magiRuntime.create` to create a new runtime.
 pass callbacks to have immediate updates when state changes:
 - `runtimeUpdated(runtime)` called when graphs are processed. called even if no changes are made
 
+call `updateRuntime` to update the runtime with new data.
+critically, this should happen with the `project` field with the project that is loaded from Rivet.
+
 use `makeSerializeable` to generate an object for saving to JSON
 
 trigger `processGraphs` to begin a graph process. runtimeUpdated will be called when the process is complete.
+
+
+basic setup:
+1. create magi runtime
+2. load a rivet project
+3. update the runtime with the project
+4. process the graphs
