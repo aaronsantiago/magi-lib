@@ -16,3 +16,26 @@ basic setup:
 2. load a rivet project
 3. update the runtime with the project
 4. process the graphs
+
+
+NOTE:
+when running in browser, build systems may complain about top-level await.
+this is however only used in the node context, so you may want to configure your build system to ignore this.
+```javascript
+
+export default defineConfig({
+  optimizeDeps: {
+    esbuildOptions: {
+      supported: {
+            'top-level-await': true //browsers can handle top-level-await features
+          },
+    }
+  },
+  esbuild: {
+      supported: {
+        'top-level-await': true //browsers can handle top-level-await features
+      },
+  },
+	plugins: [sveltekit()]
+});
+```
