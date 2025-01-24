@@ -2,18 +2,6 @@ import * as Rivet from '@ironclad/rivet-core'
 import * as graphData from './logic/graphLogic.js'
 import * as magiLogic from './logic/magiLogic.js'
 
-function asdf(callbacks) {
-  let a = 1 + 2;
-  let b = a + 3;
-
-  return {
-    project: null,
-    graphData: null,
-    callbacks: callbacks,
-    IGNORE_THIS: b,
-  }
-}
-
 function loadRivetGraph(runtime, fileContent) {
   runtime.project = Rivet.loadProjectFromString(fileContent);
 }
@@ -82,7 +70,6 @@ export default {
   loadRivetGraph,
   loadMagiProject,
   createRuntime,
-  asdf,
   updateRuntime,
   processGraphs,
   makeSerializeable
