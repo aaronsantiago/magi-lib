@@ -1,15 +1,20 @@
 /** @format */
 import * as fengari from 'fengari'
+
+let lua, lauxlib, lualib, to_luastring
 if (typeof window === 'undefined') {
-  console.log("running in node mode");
+  lua = fengari.lua
+  lauxlib = fengari.lauxlib
+  lualib = fengari.lualib
+  to_luastring = fengari.to_luastring
 }
 else {
-  fengari = window.fengari
+  lua = window.fengari.lua
+  lauxlib = window.fengari.lauxlib
+  lualib = window.fengari.lualib
+  to_luastring = window.fengari.to_luastring
 }
 
-const lua = fengari.lua
-const lauxlib = fengari.lauxlib
-const lualib = fengari.lualib
 
 const {
   LUA_TBOOLEAN,
@@ -51,7 +56,7 @@ export function runWithGlobals(globals, code, getglobals = []) {
   const L = lauxlib.luaL_newstate()
   lualib.luaL_openlibs(L)
   flua_setglobals(L, globals)
-  let bad = lauxlib.luaL_loadstring(L, fengari.to_luastring(code))
+  let bad = lauxlib.luaL_loadstring(L, to_luastring(code))
   if (bad) {
     throw new Error(bad)
   }
