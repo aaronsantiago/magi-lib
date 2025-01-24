@@ -66,7 +66,7 @@ function makeSerializeable(runtime) {
   return serializeableObject
 }
 
-export {
+export default {
   loadRivetGraph,
   loadMagiProject,
   create,
