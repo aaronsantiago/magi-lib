@@ -1,4 +1,4 @@
-import * as Rivet from '@ironclad/rivet-node'
+import * as Rivet from '@ironclad/rivet-core'
 import { runInputScript, runOutputScript } from './magiLogic.js'
 
 function addOrUpdateGraph(graph, graphData) {
@@ -103,7 +103,7 @@ async function processGraphs(runtime, runtimeUpdatedCallback) {
           if (runtimeUpdatedCallback) {
             runtimeUpdatedCallback(runtime)
           }
-          let result = await Rivet.runGraph(project, {
+          let result = await Rivet.coreRunGraph(project, {
             graph: graph,
             inputs: inputMap,
             openAiKey: api.apiKey,

@@ -1,5 +1,21 @@
+import * as Rivet from '@ironclad/rivet-core'
 import * as graphData from './logic/graphLogic.js'
 import * as magiLogic from './logic/magiLogic.js'
+
+function loadRivetGraph(runtime, fileContent) {
+  runtime.project = Rivet.loadProjectFromString(fileContent);
+}
+
+async function loadMagiProject(runtime, fileContent) {
+
+  let data = JSON.parse(fileContent);
+  data.status = {
+    graphs: [],
+    scripts: []
+  };
+
+  updateRuntime(runtime, data);
+}
 
 function create(callbacks) {
   return {
@@ -51,6 +67,8 @@ function makeSerializeable(runtime) {
 }
 
 export {
+  loadRivetGraph,
+  loadMagiProject,
   create,
   updateRuntime,
   processGraphs,
