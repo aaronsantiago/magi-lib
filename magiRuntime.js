@@ -2,7 +2,7 @@ import * as Rivet from '@ironclad/rivet-core'
 import * as graphData from './logic/graphLogic.js'
 import * as magiLogic from './logic/magiLogic.js'
 
-function loadRivetGraph(runtime, fileContent) {
+function loadRivetGraph(callbacks) {
   // runtime.project = Rivet.loadProjectFromString(fileContent);
   return {
       project: null,
