@@ -1,23 +1,9 @@
 /** @format */
-import * as fengari from 'fengari'
+// import * as fengari from 'fengari'
 
-let lua, lauxlib, lualib, to_luastring
-if (typeof window === 'undefined') {
-  lua = fengari.lua
-  lauxlib = fengari.lauxlib
-  lualib = fengari.lualib
-  to_luastring = fengari.to_luastring
-}
-else {
-  lua = window.fengari.lua
-  lauxlib = window.fengari.lauxlib
-  lualib = window.fengari.lualib
-  to_luastring = window.fengari.to_luastring
-}
+let lua, lauxlib, lualib, to_luastring;
 
-
-const {
-  LUA_TBOOLEAN,
+let LUA_TBOOLEAN,
   LUA_TFUNCTION,
   LUA_TNIL,
   LUA_TNUMBER,
@@ -44,8 +30,81 @@ const {
   lua_tojsstring,
   lua_tonumber,
   lua_tointeger,
-  lua_type
-} = lua
+  lua_type;
+if (typeof window === 'undefined') {
+  let fengari = await import('fengari');
+  lua = fengari.lua
+  lauxlib = fengari.lauxlib
+  lualib = fengari.lualib
+  to_luastring = fengari.to_luastring
+
+  LUA_TBOOLEAN = lua.LUA_TBOOLEAN;
+  LUA_TFUNCTION = lua.LUA_TFUNCTION;
+  LUA_TNIL = lua.LUA_TNIL;
+  LUA_TNUMBER = lua.LUA_TNUMBER;
+  LUA_TSTRING = lua.LUA_TSTRING;
+  LUA_TTABLE = lua.LUA_TTABLE;
+  lua_gettop = lua.lua_gettop;
+  lua_isnone = lua.lua_isnone;
+  lua_pop = lua.lua_pop;
+  lua_createtable = lua.lua_createtable;
+  lua_next = lua.lua_next;
+  lua_pushboolean = lua.lua_pushboolean;
+  lua_pushjsfunction = lua.lua_pushjsfunction;
+  lua_pushnil = lua.lua_pushnil;
+  lua_pushnumber = lua.lua_pushnumber;
+  lua_pushstring = lua.lua_pushstring;
+  lua_rawlen = lua.lua_rawlen;
+  lua_rawgeti = lua.lua_rawgeti;
+  lua_rawseti = lua.lua_rawseti;
+  lua_rawget = lua.lua_rawget;
+  lua_rawset = lua.lua_rawset;
+  lua_setglobal = lua.lua_setglobal;
+  lua_getglobal = lua.lua_getglobal;
+  lua_toboolean = lua.lua_toboolean;
+  lua_tojsstring = lua.lua_tojsstring;
+  lua_tonumber = lua.lua_tonumber;
+  lua_tointeger = lua.lua_tointeger;
+  lua_type = lua.lua_type;
+}
+else {
+  lua = window.fengari.lua
+  lauxlib = window.fengari.lauxlib
+  lualib = window.fengari.lualib
+  to_luastring = window.fengari.to_luastring
+
+
+  LUA_TBOOLEAN = lua.LUA_TBOOLEAN;
+  LUA_TFUNCTION = lua.LUA_TFUNCTION;
+  LUA_TNIL = lua.LUA_TNIL;
+  LUA_TNUMBER = lua.LUA_TNUMBER;
+  LUA_TSTRING = lua.LUA_TSTRING;
+  LUA_TTABLE = lua.LUA_TTABLE;
+  lua_gettop = lua.lua_gettop;
+  lua_isnone = lua.lua_isnone;
+  lua_pop = lua.lua_pop;
+  lua_createtable = lua.lua_createtable;
+  lua_next = lua.lua_next;
+  lua_pushboolean = lua.lua_pushboolean;
+  lua_pushjsfunction = lua.lua_pushjsfunction;
+  lua_pushnil = lua.lua_pushnil;
+  lua_pushnumber = lua.lua_pushnumber;
+  lua_pushstring = lua.lua_pushstring;
+  lua_rawlen = lua.lua_rawlen;
+  lua_rawgeti = lua.lua_rawgeti;
+  lua_rawseti = lua.lua_rawseti;
+  lua_rawget = lua.lua_rawget;
+  lua_rawset = lua.lua_rawset;
+  lua_setglobal = lua.lua_setglobal;
+  lua_getglobal = lua.lua_getglobal;
+  lua_toboolean = lua.lua_toboolean;
+  lua_tojsstring = lua.lua_tojsstring;
+  lua_tonumber = lua.lua_tonumber;
+  lua_tointeger = lua.lua_tointeger;
+  lua_type = lua.lua_type;
+}
+
+
 
 // utils
 export function run(code, getglobals) {
