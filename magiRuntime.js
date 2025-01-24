@@ -2,6 +2,27 @@ import * as Rivet from '@ironclad/rivet-core'
 import * as graphData from './logic/graphLogic.js'
 import * as magiLogic from './logic/magiLogic.js'
 
+function asdf(callbacks) {
+  return {
+      project: null,
+      graphData: null,
+      callbacks: callbacks,
+      runtimeData: {},
+      graphScripts: {},
+      scripts: {},
+      status: {
+        graphs: [],
+        scripts: [],
+      },
+      graphInputCache: {},
+      api: {
+        apiKey: '',
+        organizationId: '',
+        endpointUrl: ''
+      }
+    }
+}
+
 function loadRivetGraph(runtime, fileContent) {
   runtime.project = Rivet.loadProjectFromString(fileContent);
 }
@@ -36,27 +57,6 @@ function createRuntime(callbacks) {
       endpointUrl: ''
     }
   }
-}
-
-function asdf(callbacks) {
-  return {
-      project: null,
-      graphData: null,
-      callbacks: callbacks,
-      runtimeData: {},
-      graphScripts: {},
-      scripts: {},
-      status: {
-        graphs: [],
-        scripts: [],
-      },
-      graphInputCache: {},
-      api: {
-        apiKey: '',
-        organizationId: '',
-        endpointUrl: ''
-      }
-    }
 }
 
 function updateRuntime(runtime, newRuntime, triggerCallbacks = true) {
