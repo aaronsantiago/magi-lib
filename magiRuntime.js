@@ -2,26 +2,8 @@ import * as Rivet from '@ironclad/rivet-core'
 import * as graphData from './logic/graphLogic.js'
 import * as magiLogic from './logic/magiLogic.js'
 
-function loadRivetGraph(callbacks) {
-  // runtime.project = Rivet.loadProjectFromString(fileContent);
-  return {
-      project: null,
-      graphData: null,
-      callbacks: callbacks,
-      runtimeData: {},
-      graphScripts: {},
-      scripts: {},
-      status: {
-        graphs: [],
-        scripts: [],
-      },
-      graphInputCache: {},
-      api: {
-        apiKey: '',
-        organizationId: '',
-        endpointUrl: ''
-      }
-    }
+function loadRivetGraph(runtime, fileContent) {
+  runtime.project = Rivet.loadProjectFromString(fileContent);
 }
 
 async function loadMagiProject(runtime, fileContent) {
@@ -56,6 +38,28 @@ function createRuntime(callbacks) {
   }
 }
 
+function createRuntime2(callbacks) {
+
+  return {
+      project: null,
+      graphData: null,
+      callbacks: callbacks,
+      runtimeData: {},
+      graphScripts: {},
+      scripts: {},
+      status: {
+        graphs: [],
+        scripts: [],
+      },
+      graphInputCache: {},
+      api: {
+        apiKey: '',
+        organizationId: '',
+        endpointUrl: ''
+      }
+    }
+}
+
 function updateRuntime(runtime, newRuntime, triggerCallbacks = true) {
   for (let key of Object.keys(newRuntime)) {
     runtime[key] = newRuntime[key];
@@ -88,6 +92,7 @@ export default {
   loadRivetGraph,
   loadMagiProject,
   createRuntime,
+  createRuntime2,
   updateRuntime,
   processGraphs,
   makeSerializeable
