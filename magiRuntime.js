@@ -4,23 +4,10 @@ import * as magiLogic from './logic/magiLogic.js'
 
 function asdf(callbacks) {
   return {
-      project: null,
-      graphData: null,
-      callbacks: callbacks,
-      runtimeData: {},
-      graphScripts: {},
-      scripts: {},
-      status: {
-        graphs: [],
-        scripts: [],
-      },
-      graphInputCache: {},
-      api: {
-        apiKey: '',
-        organizationId: '',
-        endpointUrl: ''
-      }
-    }
+    project: null,
+    graphData: null,
+    callbacks: callbacks,
+  }
 }
 
 function loadRivetGraph(runtime, fileContent) {
