@@ -5,8 +5,7 @@
   "main": "./magiRuntime.js",
   "type": "module",
   "dependencies": {
-    "@ironclad/rivet-node": "^1.19.1",
-    "chokidar": "^3.6.0",
+    "@ironclad/rivet-core": "^1.20.2",
     "fengari": "^0.1.4"
   }
 }
