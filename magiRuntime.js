@@ -3,10 +3,14 @@ import * as graphData from './logic/graphLogic.js'
 import * as magiLogic from './logic/magiLogic.js'
 
 function asdf(callbacks) {
+  let a = 1 + 2;
+  let b = a + 3;
+
   return {
     project: null,
     graphData: null,
     callbacks: callbacks,
+    IGNORE_THIS: b,
   }
 }
 
