@@ -17,7 +17,7 @@ async function loadMagiProject(runtime, fileContent) {
   updateRuntime(runtime, data);
 }
 
-function create(callbacks) {
+function createRuntime(callbacks) {
   return {
     project: null,
     graphData: null,
@@ -69,7 +69,7 @@ function makeSerializeable(runtime) {
 export default {
   loadRivetGraph,
   loadMagiProject,
-  create,
+  createRuntime,
   updateRuntime,
   processGraphs,
   makeSerializeable
