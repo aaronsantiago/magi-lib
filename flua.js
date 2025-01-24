@@ -1,5 +1,5 @@
 /** @format */
-import * as fengari from 'fengari'
+let fengari = window.fengari
 
 const lua = fengari.lua
 const lauxlib = fengari.lauxlib
