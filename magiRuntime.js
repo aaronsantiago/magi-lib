@@ -38,8 +38,7 @@ function createRuntime(callbacks) {
   }
 }
 
-function createRuntime2(callbacks) {
-
+function asdf(callbacks) {
   return {
       project: null,
       graphData: null,
@@ -92,7 +91,7 @@ export default {
   loadRivetGraph,
   loadMagiProject,
   createRuntime,
-  createRuntime2,
+  asdf,
   updateRuntime,
   processGraphs,
   makeSerializeable
