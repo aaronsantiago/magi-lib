@@ -1,5 +1,11 @@
 /** @format */
-let fengari = window.fengari
+import * as fengari from 'fengari'
+if (typeof window === 'undefined') {
+  console.log("running in node mode");
+}
+else {
+  fengari = window.fengari
+}
 
 const lua = fengari.lua
 const lauxlib = fengari.lauxlib
