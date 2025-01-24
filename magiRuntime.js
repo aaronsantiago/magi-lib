@@ -3,7 +3,25 @@ import * as graphData from './logic/graphLogic.js'
 import * as magiLogic from './logic/magiLogic.js'
 
 function loadRivetGraph(runtime, fileContent) {
-  runtime.project = Rivet.loadProjectFromString(fileContent);
+  // runtime.project = Rivet.loadProjectFromString(fileContent);
+  return {
+      project: null,
+      graphData: null,
+      callbacks: callbacks,
+      runtimeData: {},
+      graphScripts: {},
+      scripts: {},
+      status: {
+        graphs: [],
+        scripts: [],
+      },
+      graphInputCache: {},
+      api: {
+        apiKey: '',
+        organizationId: '',
+        endpointUrl: ''
+      }
+    }
 }
 
 async function loadMagiProject(runtime, fileContent) {
