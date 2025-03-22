@@ -69,43 +69,18 @@ async function runGraph(runtime, runtimeUpdatedCallback, graph) {
   let {
     rivetProject,
     graphData,
-    // graphInputCache,
     runtimeData,
     status,
     // scripts,
-    // graphScripts,
     api,
   } = runtime;
   let gd = graphData[graph];
   let inputMap = {};
 
-  // collect inputs for scripts
-
+  // collect inputs
   for (let input of Object.keys(gd.inputs)) {
     inputMap[input] = runtimeData[input];
   }
-
-  // // run input scripts
-  // if (graphScripts[graph]) {
-  //   for (let scriptName of graphScripts[graph]) {
-  //     let script = scripts[scriptName]
-
-  //     if (script.type == 'input') {
-  //       status.scripts.push(scriptName)
-  //       let scriptIndex = status.scripts.length - 1;
-  //       if (runtimeUpdatedCallback) {
-  //         runtimeUpdatedCallback(runtime)
-  //       }
-  //       let data = await runInputScript(inputMap, script.script)
-  //       status.scripts.splice(scriptIndex, 1)
-  //       if (runtimeUpdatedCallback) {
-  //         runtimeUpdatedCallback(runtime)
-  //       }
-  //       console.log("input script data", data)
-  //       inputMap = data
-  //     }
-  //   }
-  // }
 
   // check to see if all dependencies are fulfilled
   let dependenciesFulfilled = true;
@@ -120,12 +95,6 @@ async function runGraph(runtime, runtimeUpdatedCallback, graph) {
     }
   }
 
-  // // check to see if the input has changed, if so, run the graph
-
-  // let inputMapJson = JSON.stringify(inputMap)
-  // if (dependenciesFulfilled && inputMapJson != graphInputCache[graph]) {
-  // graphInputCache[graph] = inputMapJson
-  //
   if (dependenciesFulfilled) {
     // run the graph
     console.log("running graph: ", graph, inputMap, api);
@@ -156,10 +125,8 @@ async function runGraph(runtime, runtimeUpdatedCallback, graph) {
         } catch (e) {
           console.error("Error parsing result json: ", e);
         }
-      } else if (key != "cost") {
+      } else if (key != "cost") { // filter out rivet reporting the cost of the query
         outputMap[key] = result[key].value;
-      } else {
-        console.log("graphLogic.js COST PARSE HIT");
       }
     }
 
@@ -179,43 +146,24 @@ async function runGraph(runtime, runtimeUpdatedCallback, graph) {
 async function runScript(runtime, runtimeUpdatedCallback, scriptName) {
   console.log("running script: ", scriptName);
   let {
-    // rivetProject,
-    // graphData,
-    // graphInputCache,
     runtimeData,
     status,
     scripts,
-    // graphScripts,
-    // api,
   } = runtime;
 
-  // run input scripts
-  // if (graphScripts[graph]) {
-  //   for (let scriptName of graphScripts[graph]) {
   let script = scripts[scriptName]
-
-      // if (script.type == 'input') {
   status.scripts.push(scriptName)
-  let scriptIndex = status.scripts.length - 1;
-  if (runtimeUpdatedCallback) {
-    runtimeUpdatedCallback(runtime)
-  }
+
   let results = await _runLuaScript({ runtimeData: runtimeData, outputs: {} }, script.script)
 
   for (let key in results.outputs) {
     runtimeData[key] = results.outputs[key];
   }
 
-  status.scripts.splice(scriptIndex, 1)
   status.scripts.splice(status.scripts.indexOf(scriptName), 1);
   if (runtimeUpdatedCallback) {
     runtimeUpdatedCallback(runtime)
   }
-  // console.log("input script data", data)
-  // inputMap = data
-      // }
-  //   }
-  // }
 }
 
 

@@ -22,13 +22,11 @@ function createRuntime(callbacks) {
     graphData: null,
     callbacks: callbacks,
     runtimeData: {},
-    graphScripts: {},
     scripts: {},
     status: {
       graphs: [],
       scripts: [],
     },
-    graphInputCache: {},
     api: {
       apiKey: '',
       organizationId: '',
@@ -78,7 +76,6 @@ export default {
   loadMagiProject,
   createRuntime,
   updateRuntime,
-  // processGraphs,
   runGraph,
   runScript,
   makeSerializeable
