@@ -25,6 +25,7 @@ async function runScript(data, script) {
   return outputs;
 }
 
+
 async function runInputScript(inputs, script) {
   let data = { inputs }
   console.log("running input script with data: ", data, " and script: ", script)

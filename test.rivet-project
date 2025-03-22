@@ -1,0 +1,29 @@
+version: 4
+data:
+  attachedData:
+    trivet:
+      testSuites: []
+      version: 1
+  graphs:
+    RN3Frh-YWbJLgoNWOxSwA:
+      metadata:
+        description: ""
+        id: RN3Frh-YWbJLgoNWOxSwA
+        name: output_hello
+      nodes:
+        '[N1IvuwpBgfHna3ssdA8f_]:graphOutput "Graph Output"':
+          data:
+            dataType: string
+            id: hello
+          visualData: 685/313/330/3//
+        '[k8hhzB1TI3-_SGQlCru7W]:text "Text"':
+          data:
+            text: hello
+          outgoingConnections:
+            - output->"Graph Output" N1IvuwpBgfHna3ssdA8f_/value
+          visualData: 256/326/330/1//
+  metadata:
+    description: ""
+    id: TxkmvMtNGRFGJPYT5P5Jm
+    title: Untitled Project
+  plugins: []

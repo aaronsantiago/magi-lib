@@ -1,9 +1,8 @@
 import * as Rivet from '@ironclad/rivet-core'
-import * as graphData from './logic/graphLogic.js'
-import * as magiLogic from './logic/magiLogic.js'
+import * as graphLogic from './logic/graphLogic.js'
 
 function loadRivetGraph(runtime, fileContent) {
-  runtime.project = Rivet.loadProjectFromString(fileContent);
+  runtime.rivetProject = Rivet.loadProjectFromString(fileContent);
 }
 
 async function loadMagiProject(runtime, fileContent) {
@@ -42,7 +41,7 @@ function updateRuntime(runtime, newRuntime, triggerCallbacks = true) {
   for (let key of Object.keys(newRuntime)) {
     runtime[key] = newRuntime[key];
   }
-  if (runtime.project) runtime.graphData = graphData.loadProject(runtime.project)
+  if (runtime.rivetProject) runtime.graphData = graphLogic.loadProject(runtime.rivetProject)
   if (triggerCallbacks && runtime.callbacks.runtimeUpdated) {
     runtime.callbacks.runtimeUpdated(runtime);
   }
@@ -50,11 +49,11 @@ function updateRuntime(runtime, newRuntime, triggerCallbacks = true) {
 
 async function processGraphs(runtime) {
   if (runtime.callbacks.runtimeUpdated) {
-    await graphData.processGraphs(runtime, runtime.callbacks.runtimeUpdated)
+    await graphLogic.processGraphs(runtime, runtime.callbacks.runtimeUpdated)
     runtime.callbacks.runtimeUpdated(runtime)
   }
   else {
-    await graphData.processGraphs(runtime)
+    await graphLogic.processGraphs(runtime)
   }
 }
 
@@ -66,11 +65,21 @@ function makeSerializeable(runtime) {
   return serializeableObject
 }
 
+async function runGraph(runtime, graph) {
+  await graphLogic.runGraph(runtime, runtime.callbacks.runtimeUpdated || null, graph)
+}
+
+async function runScript(runtime, script) {
+  await graphLogic.runScript(runtime, runtime.callbacks.runtimeUpdated || null, script);
+}
+
 export default {
   loadRivetGraph,
   loadMagiProject,
   createRuntime,
   updateRuntime,
-  processGraphs,
+  // processGraphs,
+  runGraph,
+  runScript,
   makeSerializeable
 }

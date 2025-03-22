@@ -1,0 +1,29 @@
+{
+  "runtimeData": {
+    "world": "old"
+  },
+  "graphScripts": {
+    "runRequest": [
+      "test2"
+    ],
+    "do_action": [
+      "apply_room_items_delta"
+    ]
+  },
+  "scripts": {
+    "hello-to-world": {
+      "type": "input",
+      "script": "outputs.world = runtimeData.hello"
+    }
+  },
+  "status": {
+    "graphs": [],
+    "scripts": []
+  },
+  "api": {
+    "apiKey": "",
+    "organizationId": "",
+    "endpointUrl": ""
+  },
+  "graphStatus": {}
+}
