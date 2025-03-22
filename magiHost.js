@@ -1,7 +1,7 @@
 import * as Rivet from "@ironclad/rivet-core";
-import * as flua from '../flua.js'
+import * as flua from './lib/flua.js'
 
-function loadProject(rivetProject, graphData = {}) {
+function loadRivetProject(rivetProject, graphData = {}) {
   for (let graphId in rivetProject.graphs) {
     let graph = rivetProject.graphs[graphId];
     _addOrUpdateGraph(graph, graphData);
@@ -30,39 +30,10 @@ function _addOrUpdateGraph(graph, graphData) {
   }
 
   graphData[graphId] = {
-    graph: graph,
     magiProperties: magiProperties,
     inputs: inputs,
     outputs: outputs,
   };
-}
-
-
-async function _processGraphs(runtime, runtimeUpdatedCallback) {
-  let {
-    rivetProject,
-    graphData,
-    graphInputCache,
-    runtimeData,
-    status,
-    scripts,
-    graphScripts,
-    api,
-  } = runtime;
-
-  let graphPromises = [];
-
-  for (let graphId in rivetProject.graphs) {
-    let graph = rivetProject.graphs[graphId].metadata.name;
-    if (graph.startsWith("_")) continue;
-    if (status.graphs.indexOf(graph) != -1) {
-      continue;
-    }
-
-    graphPromises.push();
-  }
-
-  await Promise.all(graphPromises);
 }
 
 async function runGraph(runtime, runtimeUpdatedCallback, graph) {
@@ -71,7 +42,6 @@ async function runGraph(runtime, runtimeUpdatedCallback, graph) {
     graphData,
     runtimeData,
     status,
-    // scripts,
     api,
   } = runtime;
   let gd = graphData[graph];
@@ -191,4 +161,4 @@ async function _runLuaScript(data, script) {
   return outputs;
 }
 
-export { loadProject, runGraph, runScript };
+export { loadRivetProject, runGraph, runScript };
