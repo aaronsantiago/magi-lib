@@ -1,7 +1,47 @@
 import * as Rivet from "@ironclad/rivet-core";
-import * as flua from './lib/flua.js'
+import * as flua from "./lib/flua.js";
 
-function loadRivetProject(rivetProject, graphData = {}) {
+export function updateRuntimeData(runtime, runtimeData, triggerCallbacks = true) {
+  for (let key of Object.keys(runtimeData)) {
+    runtime.runtimeData[key] = runtimeData[key];
+  }
+  updateRuntime(runtime, {}, triggerCallbacks);
+}
+
+export function updateMetadata(runtime, metadata, triggerCallbacks = true) {
+  for (let key of Object.keys(metadata)) {
+    runtime.metadata[key] = metadata[key];
+  }
+  updateRuntime(runtime, {}, triggerCallbacks);
+}
+
+export function loadRivetProject(runtime, rivetProject) {
+  runtime.rivetProject = Rivet.loadProjectFromString(rivetProject);
+  updateRuntime(runtime, {});
+}
+
+export function loadMagiProject(runtime, magiProject) {
+  let data = JSON.parse(magiProject);
+  data.status = {
+    graphs: [],
+    scripts: []
+  };
+
+  updateRuntime(runtime, data);
+}
+
+export function updateRuntime(runtime, newRuntime, triggerCallbacks = true) {
+  for (let key of Object.keys(newRuntime)) {
+    runtime[key] = newRuntime[key];
+  }
+  if (runtime.rivetProject)
+    runtime.graphData = updateGraphData(runtime.rivetProject);
+  if (triggerCallbacks && runtime.callbacks.runtimeUpdated) {
+    runtime.callbacks.runtimeUpdated(runtime);
+  }
+}
+
+export function updateGraphData(rivetProject, graphData = {}) {
   for (let graphId in rivetProject.graphs) {
     let graph = rivetProject.graphs[graphId];
     _addOrUpdateGraph(graph, graphData);
@@ -36,14 +76,8 @@ function _addOrUpdateGraph(graph, graphData) {
   };
 }
 
-async function runGraph(runtime, runtimeUpdatedCallback, graph) {
-  let {
-    rivetProject,
-    graphData,
-    runtimeData,
-    status,
-    api,
-  } = runtime;
+export async function runGraph(runtime, runtimeUpdatedCallback, graph) {
+  let { rivetProject, graphData, runtimeData, status, api } = runtime;
   let gd = graphData[graph];
   let inputMap = {};
 
@@ -95,7 +129,8 @@ async function runGraph(runtime, runtimeUpdatedCallback, graph) {
         } catch (e) {
           console.error("Error parsing result json: ", e);
         }
-      } else if (key != "cost") { // filter out rivet reporting the cost of the query
+      } else if (key != "cost") {
+        // filter out rivet reporting the cost of the query
         outputMap[key] = result[key].value;
       }
     }
@@ -109,22 +144,20 @@ async function runGraph(runtime, runtimeUpdatedCallback, graph) {
     if (runtimeUpdatedCallback) {
       runtimeUpdatedCallback(runtime);
     }
-
   }
 }
 
-async function runScript(runtime, runtimeUpdatedCallback, scriptName) {
+export async function runScript(runtime, runtimeUpdatedCallback, scriptName) {
   console.log("running script: ", scriptName);
-  let {
-    runtimeData,
-    status,
-    scripts,
-  } = runtime;
+  let { runtimeData, status, scripts } = runtime;
 
-  let script = scripts[scriptName]
-  status.scripts.push(scriptName)
+  let script = scripts[scriptName];
+  status.scripts.push(scriptName);
 
-  let results = await _runLuaScript({ runtimeData: runtimeData, outputs: {} }, script.script)
+  let results = await _runLuaScript(
+    { runtimeData: runtimeData, outputs: {} },
+    script.script,
+  );
 
   for (let key in results.outputs) {
     runtimeData[key] = results.outputs[key];
@@ -132,33 +165,34 @@ async function runScript(runtime, runtimeUpdatedCallback, scriptName) {
 
   status.scripts.splice(status.scripts.indexOf(scriptName), 1);
   if (runtimeUpdatedCallback) {
-    runtimeUpdatedCallback(runtime)
+    runtimeUpdatedCallback(runtime);
   }
 }
-
 
 async function _runLuaScript(data, script) {
   let outputs = {};
 
   try {
-    let out = flua.runWithGlobals({
-      json: JSON.parse,
-      j2s: JSON.stringify,
-      print: console.log,
-      ...data
-    }, script, [...Object.keys(data)])
+    let out = flua.runWithGlobals(
+      {
+        json: JSON.parse,
+        j2s: JSON.stringify,
+        print: console.log,
+        ...data,
+      },
+      script,
+      [...Object.keys(data)],
+    );
     for (let key in data) {
       console.log("getting key: ", key);
       outputs[key] = out[key];
       console.log("setting key: ", key, " to: ", outputs[key]);
     }
   } catch (e) {
-    console.log("flua error")
+    console.log("flua error");
     console.log(e);
   }
 
   console.log("returning data: ", outputs);
   return outputs;
 }
-
-export { loadRivetProject, runGraph, runScript };
