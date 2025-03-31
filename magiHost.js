@@ -1,47 +1,110 @@
 import * as Rivet from "@ironclad/rivet-core";
 import * as flua from "./lib/flua.js";
+import { io } from "socket.io-client";
 
-export function updateRuntimeData(runtime, runtimeData, triggerCallbacks = true) {
-  for (let key of Object.keys(runtimeData)) {
-    runtime.runtimeData[key] = runtimeData[key];
+export function createHostRuntime(callbacks, socketAddress, socketPrefix) {
+  let runtime = {
+    host: true,
+    project: null,
+    graphData: null,
+    scriptData: null,
+    callbacks: callbacks,
+    runtimeData: {},
+    scripts: {},
+    status: {
+      graphs: [],
+      scripts: [],
+    },
+    metadata: {},
+    api: {
+      apiKey: "",
+      organizationId: "",
+      endpointUrl: "",
+    },
+  };
+
+  if (socketAddress) {
+    const socket = io(socketAddress);
+    runtime.socket = socket;
+    runtime.socketPrefix = socketPrefix;
+
+    socket.onAny((event, data) => {
+      if (event.startsWith(socketPrefix + "/system/")) {
+        event = event.slice((socketPrefix + "/system/").length);
+        ({
+          updateRuntimeData,
+          updateMetadata,
+          loadRivetProject,
+          loadMagiProject,
+          updateRuntime,
+          runGraph,
+          runScript,
+        })[event](runtime, data);
+      }
+    });
   }
-  updateRuntime(runtime, {}, triggerCallbacks);
+
+  return runtime;
 }
 
-export function updateMetadata(runtime, metadata, triggerCallbacks = true) {
+export function updateRuntimeData(
+  runtime,
+  runtimeData
+) {
+  for (let key of Object.keys(runtimeData)) {
+    runtime.runtimeData[key] = runtimeData[key];
+    _sendUpdate(runtime, "runtimeData/" + key, runtimeData[key]);
+  }
+  updateRuntime(runtime, {});
+}
+
+export function updateMetadata(runtime, metadata) {
   for (let key of Object.keys(metadata)) {
     runtime.metadata[key] = metadata[key];
   }
-  updateRuntime(runtime, {}, triggerCallbacks);
+  updateRuntime(runtime, {});
 }
 
 export function loadRivetProject(runtime, rivetProject) {
-  runtime.rivetProject = Rivet.loadProjectFromString(rivetProject);
-  updateRuntime(runtime, {});
+  updateRuntime(runtime, {
+    rivetProject: Rivet.loadProjectFromString(rivetProject),
+  });
 }
 
 export function loadMagiProject(runtime, magiProject) {
   let data = JSON.parse(magiProject);
   data.status = {
     graphs: [],
-    scripts: []
+    scripts: [],
   };
+  let runtimeData = data.runtimeData;
+  delete data["runtimeData"];
 
   updateRuntime(runtime, data);
+  updateRuntimeData(runtime, runtimeData);
 }
 
-export function updateRuntime(runtime, newRuntime, triggerCallbacks = true) {
+export function updateRuntime(runtime, newRuntime) {
   for (let key of Object.keys(newRuntime)) {
     runtime[key] = newRuntime[key];
+    _sendUpdate(runtime, key, newRuntime[key]);
   }
-  if (runtime.rivetProject)
-    runtime.graphData = updateGraphData(runtime.rivetProject);
-  if (triggerCallbacks && runtime.callbacks.runtimeUpdated) {
-    runtime.callbacks.runtimeUpdated(runtime);
+  if (newRuntime.rivetProject) {
+    runtime.graphData = _updateGraphData(runtime.rivetProject);
+    _sendUpdate(runtime, "graphData", runtime.graphData);
   }
 }
 
-export function updateGraphData(rivetProject, graphData = {}) {
+function _sendUpdate(runtime, key, value) {
+  if (runtime.socket) {
+    if (runtime.socketPrefix) {
+      key = runtime.socketPrefix + "/" + key;
+    }
+    runtime.socket.emit(key, value);
+  }
+}
+
+function _updateGraphData(rivetProject, graphData = {}) {
   for (let graphId in rivetProject.graphs) {
     let graph = rivetProject.graphs[graphId];
     _addOrUpdateGraph(graph, graphData);
@@ -76,7 +139,7 @@ function _addOrUpdateGraph(graph, graphData) {
   };
 }
 
-export async function runGraph(runtime, runtimeUpdatedCallback, graph) {
+export async function runGraph(runtime, graph) {
   let { rivetProject, graphData, runtimeData, status, api } = runtime;
   let gd = graphData[graph];
   let inputMap = {};
@@ -103,9 +166,6 @@ export async function runGraph(runtime, runtimeUpdatedCallback, graph) {
     // run the graph
     console.log("running graph: ", graph, inputMap, api);
     status.graphs.push(graph);
-    if (runtimeUpdatedCallback) {
-      runtimeUpdatedCallback(runtime);
-    }
     let result = await Rivet.coreRunGraph(rivetProject, {
       graph: graph,
       inputs: inputMap,
@@ -113,9 +173,6 @@ export async function runGraph(runtime, runtimeUpdatedCallback, graph) {
       openAiEndpoint: api.endpointUrl,
     });
     status.graphs.splice(status.graphs.indexOf(graph), 1);
-    if (runtimeUpdatedCallback) {
-      runtimeUpdatedCallback(runtime);
-    }
 
     let outputMap = {};
 
@@ -141,13 +198,10 @@ export async function runGraph(runtime, runtimeUpdatedCallback, graph) {
         runtimeData[output] = outputMap[output];
       }
     }
-    if (runtimeUpdatedCallback) {
-      runtimeUpdatedCallback(runtime);
-    }
   }
 }
 
-export async function runScript(runtime, runtimeUpdatedCallback, scriptName) {
+export async function runScript(runtime, scriptName) {
   console.log("running script: ", scriptName);
   let { runtimeData, status, scripts } = runtime;
 
@@ -159,14 +213,9 @@ export async function runScript(runtime, runtimeUpdatedCallback, scriptName) {
     script.script,
   );
 
-  for (let key in results.outputs) {
-    runtimeData[key] = results.outputs[key];
-  }
+  updateRuntimeData(runtime, results.outputs);
 
   status.scripts.splice(status.scripts.indexOf(scriptName), 1);
-  if (runtimeUpdatedCallback) {
-    runtimeUpdatedCallback(runtime);
-  }
 }
 
 async function _runLuaScript(data, script) {
@@ -184,15 +233,12 @@ async function _runLuaScript(data, script) {
       [...Object.keys(data)],
     );
     for (let key in data) {
-      console.log("getting key: ", key);
       outputs[key] = out[key];
-      console.log("setting key: ", key, " to: ", outputs[key]);
     }
   } catch (e) {
     console.log("flua error");
     console.log(e);
   }
 
-  console.log("returning data: ", outputs);
   return outputs;
 }

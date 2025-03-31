@@ -4,3 +4,6 @@ out
 .DS_Store
 *.log*
 test.js
+test.magi
+test.rivet-project
+test-rig

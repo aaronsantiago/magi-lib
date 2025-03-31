@@ -1,56 +1,77 @@
 import * as Rivet from '@ironclad/rivet-core'
 import * as magiHost from './magiHost.js'
+import * as magiClient from './magiClient.js'
 
 export function updateRuntimeData(runtime, data) {
-  magiHost.updateRuntimeData(runtime, data);
+  if (runtime.host) {
+    magiHost.updateRuntimeData(runtime, data);
+  }
+  else {
+    magiClient.updateRuntimeData(runtime, data);
+  }
 }
 
 export function updateMetadata(runtime, metadata) {
-  magiHost.updateMetadata(runtime, metadata);
+  if (runtime.host) {
+    magiHost.updateMetadata(runtime, metadata);
+  }
+  else {
+    magiClient.updateMetadata(runtime, metadata);
+  }
 }
 
 export async function runGraph(runtime, graph) {
-  await magiHost.runGraph(runtime, runtime.callbacks.runtimeUpdated || null, graph)
+  if (runtime.host) {
+    await magiHost.runGraph(runtime, graph)
+  }
+  else {
+    magiClient.runGraph(runtime, graph)
+  }
 }
 
 export async function runScript(runtime, script) {
-  await magiHost.runScript(runtime, runtime.callbacks.runtimeUpdated || null, script);
+  if (runtime.host) {
+    await magiHost.runScript(runtime, script);
+  }
+  else {
+    magiClient.runScript(runtime, script);
+  }
 }
 
 export function loadRivetProject(runtime, rivetProject) {
-  magiHost.loadRivetProject(runtime, rivetProject)
+  if (runtime.host) {
+    magiHost.loadRivetProject(runtime, rivetProject)
+  }
+  else {
+    magiClient.loadRivetProject(runtime, rivetProject)
+  }
 }
 
 export function loadMagiProject(runtime, magiProject) {
-  magiHost.loadMagiProject(runtime, magiProject)
+  if (runtime.host) {
+    magiHost.loadMagiProject(runtime, magiProject)
+  }
+  else {
+    magiClient.loadMagiProject(runtime, magiProject)
+  }
 }
 
-// host only functions
+// local functions
 
-export function createRuntime(callbacks) {
-  return {
-    project: null,
-    graphData: null,
-    scriptData: null,
-    callbacks: callbacks,
-    runtimeData: {},
-    scripts: {},
-    status: {
-      graphs: [],
-      scripts: [],
-    },
-    metadata: {},
-    api: {
-      apiKey: '',
-      organizationId: '',
-      endpointUrl: ''
-    }
+export function createRuntime(callbacks, options) {
+  let { remote, socketAddress, socketPrefix } = options;
+  if (!remote) {
+    return magiHost.createHostRuntime(callbacks, socketAddress, socketPrefix);
+  }
+  else {
+    return magiClient.createClientRuntime(socketAddress, {socketPrefix})
   }
 }
 
 export function makeSerializeable(runtime) {
   let serializeableObject = { ...runtime }
 
+  delete serializeableObject.socket
   delete serializeableObject.callbacks
   delete serializeableObject.project
   delete serializeableObject.rivetProject
