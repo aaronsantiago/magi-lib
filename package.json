@@ -1,8 +1,8 @@
 {
   "name": "magi-lib",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A library to interface with Rivet graphs with complex dependencies and scripting",
-  "main": "magiRuntime.js",
+  "main": "magiApi.js",
   "type": "module",
   "dependencies": {
     "@ironclad/rivet-core": "^1.20.2",
