@@ -43,6 +43,12 @@ function _sendFunctionCall(runtime, functionName, args) {
   socket.emit(runtime.socketPrefix + "/system/" + functionName, args);
 }
 
+export function stopClientRuntime(runtime) {
+ if (runtime.socket) {
+   runtime.socket.disconnect();
+ }
+}
+
 export function updateRuntimeData(runtime, data) {
   _sendFunctionCall(runtime, "updateRuntimeData", data);
 }

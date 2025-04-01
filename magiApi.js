@@ -56,6 +56,15 @@ export function loadMagiProject(runtime, magiProject) {
   }
 }
 
+export function stopRuntime(runtime) {
+  if (runtime.host) {
+    magiHost.stopHostRuntime(runtime)
+  }
+  else {
+    magiClient.stopClientRuntime(runtime)
+  }
+}
+
 // local functions
 
 export function createRuntime(callbacks, options) {
@@ -73,8 +82,11 @@ export function makeSerializeable(runtime) {
 
   delete serializeableObject.socket
   delete serializeableObject.callbacks
-  delete serializeableObject.project
+  delete serializeableObject.projects
   delete serializeableObject.rivetProject
   delete serializeableObject.graphStatus
+  delete serializeableObject.host
+  delete serializeableObject.graphData
+
   return serializeableObject
 }

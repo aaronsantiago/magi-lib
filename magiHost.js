@@ -47,22 +47,29 @@ export function createHostRuntime(callbacks, socketAddress, socketPrefix) {
   return runtime;
 }
 
+export function stopHostRuntime(runtime) {
+ if (runtime.socket) {
+   runtime.socket.disconnect();
+ }
+}
+
 export function updateRuntimeData(
   runtime,
-  runtimeData
+  runtimeData,
+  triggerCallbacks = true,
 ) {
   for (let key of Object.keys(runtimeData)) {
     runtime.runtimeData[key] = runtimeData[key];
     _sendUpdate(runtime, "runtimeData/" + key, runtimeData[key]);
   }
-  updateRuntime(runtime, {});
+  updateRuntime(runtime, {}, triggerCallbacks);
 }
 
-export function updateMetadata(runtime, metadata) {
+export function updateMetadata(runtime, metadata, triggerCallbacks = true) {
   for (let key of Object.keys(metadata)) {
     runtime.metadata[key] = metadata[key];
   }
-  updateRuntime(runtime, {});
+  updateRuntime(runtime, {}, triggerCallbacks);
 }
 
 export function loadRivetProject(runtime, rivetProject) {
@@ -84,7 +91,7 @@ export function loadMagiProject(runtime, magiProject) {
   updateRuntimeData(runtime, runtimeData);
 }
 
-export function updateRuntime(runtime, newRuntime) {
+export function updateRuntime(runtime, newRuntime, triggerCallbacks = true) {
   for (let key of Object.keys(newRuntime)) {
     runtime[key] = newRuntime[key];
     _sendUpdate(runtime, key, newRuntime[key]);
@@ -92,6 +99,9 @@ export function updateRuntime(runtime, newRuntime) {
   if (newRuntime.rivetProject) {
     runtime.graphData = _updateGraphData(runtime.rivetProject);
     _sendUpdate(runtime, "graphData", runtime.graphData);
+  }
+  if (triggerCallbacks && runtime.callbacks.runtimeUpdated) {
+    runtime.callbacks.runtimeUpdated(runtime);
   }
 }
 
@@ -166,6 +176,9 @@ export async function runGraph(runtime, graph) {
     // run the graph
     console.log("running graph: ", graph, inputMap, api);
     status.graphs.push(graph);
+    if (runtimeUpdatedCallback) {
+      runtimeUpdatedCallback(runtime);
+    }
     let result = await Rivet.coreRunGraph(rivetProject, {
       graph: graph,
       inputs: inputMap,
@@ -173,6 +186,9 @@ export async function runGraph(runtime, graph) {
       openAiEndpoint: api.endpointUrl,
     });
     status.graphs.splice(status.graphs.indexOf(graph), 1);
+    if (runtimeUpdatedCallback) {
+      runtimeUpdatedCallback(runtime);
+    }
 
     let outputMap = {};
 
