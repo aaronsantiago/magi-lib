@@ -20,6 +20,15 @@ export function updateMetadata(runtime, metadata) {
   }
 }
 
+export function updateRuntime(runtime, newRuntime) {
+  if (runtime.host) {
+    magiHost.updateRuntime(runtime, newRuntime);
+  }
+  else {
+    magiClient.updateRuntime(runtime, newRuntime);
+  }
+}
+
 export async function runGraph(runtime, graph) {
   if (runtime.host) {
     await magiHost.runGraph(runtime, graph)

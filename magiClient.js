@@ -49,6 +49,10 @@ export function stopClientRuntime(runtime) {
  }
 }
 
+export function updateRuntime(runtime, newRuntime) {
+ _sendFunctionCall(runtime, "updateRuntime", newRuntime);
+}
+
 export function updateRuntimeData(runtime, data) {
   _sendFunctionCall(runtime, "updateRuntimeData", data);
 }
