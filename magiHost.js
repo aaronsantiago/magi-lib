@@ -5,9 +5,7 @@ import { io } from "socket.io-client";
 export function createHostRuntime(callbacks, socketAddress, socketPrefix) {
   let runtime = {
     host: true,
-    project: null,
     graphData: null,
-    scriptData: null,
     callbacks: callbacks,
     runtimeData: {},
     scripts: {},
