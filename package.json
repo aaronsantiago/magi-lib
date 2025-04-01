@@ -1,6 +1,6 @@
 {
   "name": "magi-lib",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "A library to interface with Rivet graphs with complex dependencies and scripting",
   "main": "magiApi.js",
   "type": "module",

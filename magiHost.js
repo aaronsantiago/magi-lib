@@ -198,9 +198,7 @@ export async function runGraph(runtime, graph) {
 
     if (outputMap) {
       // update the runtime data
-      for (let output of Object.keys(outputMap)) {
-        runtimeData[output] = outputMap[output];
-      }
+      updateRuntimeData(runtime, outputMap);
     }
   }
 }
