@@ -70,8 +70,9 @@ export function updateMetadata(runtime, metadata) {
 }
 
 export function loadRivetProject(runtime, rivetProject) {
+  let rp = Rivet.loadProjectFromString(rivetProject);
   updateRuntime(runtime, {
-    rivetProject: Rivet.loadProjectFromString(rivetProject),
+    rivetProject: rp,
   });
 }
 
@@ -128,11 +129,19 @@ function _addOrUpdateGraph(graph, graphData) {
 
   let inputs = {};
   let outputs = {};
-  for (let node of graph.nodes) {
+
+  let partialOutputNodeId = null;
+  for (let nodeKey in graph.nodes) {
+    let node = graph.nodes[nodeKey];
+
     if (node.type == "graphInput") {
       inputs[node.data.id] = node.id;
     } else if (node.type == "graphOutput") {
       outputs[node.data.id] = node.id;
+    }
+
+    if (node?.data?.useAsGraphPartialOutput) {
+      partialOutputNodeId = node.id;
     }
   }
 
@@ -140,6 +149,7 @@ function _addOrUpdateGraph(graph, graphData) {
     magiProperties: magiProperties,
     inputs: inputs,
     outputs: outputs,
+    partialOutputNodeId: partialOutputNodeId,
   };
 }
 
@@ -170,12 +180,33 @@ export async function runGraph(runtime, graph) {
     // run the graph
     console.log("running graph: ", graph, inputMap, api);
     status.graphs.push(graph);
-    let result = await Rivet.coreRunGraph(rivetProject, {
+    let rivetProcessor = Rivet.coreCreateProcessor(rivetProject, {
       graph: graph,
       inputs: inputMap,
       openAiKey: api.apiKey,
-      openAiEndpoint: api.endpointUrl,
+      openAiEndpoint: api.endpointUrl
     });
+
+    (async () => {
+      let total = "";
+      for await (let output of Rivet.getProcessorEvents(rivetProcessor.processor, {
+        partialOutputs: true
+      })) {
+        if (output.nodeId == runtime.graphData[graph].partialOutputNodeId) {
+          total += output.delta;
+
+          let outputs = Object.keys(runtime.graphData[graph].outputs);
+          let newRuntimeData = {}
+
+          newRuntimeData[outputs[0]] = total;
+          updateRuntimeData(runtime, newRuntimeData)
+        }
+      }
+    })()
+
+    let result = await rivetProcessor.run();
+
+
     status.graphs.splice(status.graphs.indexOf(graph), 1);
 
     let outputMap = {};
