@@ -96,6 +96,8 @@ export function makeSerializeable(runtime) {
   delete serializeableObject.graphStatus
   delete serializeableObject.host
   delete serializeableObject.graphData
+  delete serializeableObject.graphScripts
+  delete serializeableObject.status
 
   return serializeableObject
 }
