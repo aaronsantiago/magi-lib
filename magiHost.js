@@ -176,6 +176,13 @@ export async function runGraph(runtime, graph) {
     }
   }
 
+  for (let input in inputMap) {
+    inputMap[input] = {
+      type:"Any",
+      value: inputMap[input]
+    }
+  }
+
   if (dependenciesFulfilled) {
     // run the graph
     console.log("running graph: ", graph, inputMap, api);
