@@ -2,14 +2,16 @@ import * as Rivet from "@ironclad/rivet-core";
 import * as flua from "./lib/flua.js";
 import { io } from "socket.io-client";
 
-export function createClientRuntime(socketAddress, options) {
+export function createClientRuntime(socketAddress, options, baseObject = {}) {
   let { socketPrefix } = options;
   const socket = io(socketAddress);
-  const runtime = {
+  let runtime = {
     host: false,
     socket: socket,
     socketPrefix: socketPrefix,
   };
+
+  runtime = Object.assign(baseObject, runtime);
 
   socket.onAny(function (event, data) {
     if (socketPrefix != null && socketPrefix.length > 0) {

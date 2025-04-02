@@ -2,7 +2,7 @@ import * as Rivet from "@ironclad/rivet-core";
 import * as flua from "./lib/flua.js";
 import { io } from "socket.io-client";
 
-export function createHostRuntime(callbacks, socketAddress, socketPrefix) {
+export function createHostRuntime(callbacks, socketAddress, socketPrefix, baseObject = {}) {
   let runtime = {
     host: true,
     graphData: null,
@@ -20,6 +20,8 @@ export function createHostRuntime(callbacks, socketAddress, socketPrefix) {
       endpointUrl: "",
     },
   };
+
+  runtime = Object.assign(baseObject, runtime);
 
   if (socketAddress) {
     const socket = io(socketAddress);
