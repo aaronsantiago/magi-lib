@@ -76,13 +76,13 @@ export function stopRuntime(runtime) {
 
 // local functions
 
-export function createRuntime(callbacks, options) {
+export function createRuntime(callbacks, options, baseObject) {
   let { remote, socketAddress, socketPrefix } = options;
   if (!remote) {
-    return magiHost.createHostRuntime(callbacks, socketAddress, socketPrefix);
+    return magiHost.createHostRuntime(callbacks, socketAddress, socketPrefix, baseObject);
   }
   else {
-    return magiClient.createClientRuntime(socketAddress, {socketPrefix})
+    return magiClient.createClientRuntime(socketAddress, {socketPrefix}, baseObject)
   }
 }
 
