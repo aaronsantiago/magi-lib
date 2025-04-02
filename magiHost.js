@@ -41,6 +41,13 @@ export function createHostRuntime(callbacks, socketAddress, socketPrefix, baseOb
           runScript,
         })[event](runtime, data);
       }
+
+      if (event.startsWith(socketPrefix + "/setRuntimeData/")) {
+        const key = event.slice((socketPrefix + "/setRuntimeData/").length);
+        updateRuntimeData(runtime, {
+          [key]: data
+        })
+      }
     });
   }
 
