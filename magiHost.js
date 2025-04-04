@@ -172,16 +172,13 @@ export async function runGraph(runtime, graph) {
     inputMap[input] = runtimeData[input];
   }
 
-  // check to see if all dependencies are fulfilled
-  let dependenciesFulfilled = true;
+  // fill in missing inputs
   for (let input of Object.keys(gd.inputs)) {
     if (
       inputMap[input] == undefined ||
-      inputMap[input] == null ||
-      inputMap[input] == ""
+      inputMap[input] == null
     ) {
-      dependenciesFulfilled = false;
-      break;
+      inputMap[input] == "";
     }
   }
 
@@ -192,61 +189,59 @@ export async function runGraph(runtime, graph) {
     }
   }
 
-  if (dependenciesFulfilled) {
-    // run the graph
-    console.log("running graph: ", graph, inputMap, api);
-    status.graphs.push(graph);
-    let rivetProcessor = Rivet.coreCreateProcessor(rivetProject, {
-      graph: graph,
-      inputs: inputMap,
-      openAiKey: api.apiKey,
-      openAiEndpoint: api.endpointUrl
-    });
+  // run the graph
+  console.log("running graph: ", graph, inputMap, api);
+  status.graphs.push(graph);
+  let rivetProcessor = Rivet.coreCreateProcessor(rivetProject, {
+    graph: graph,
+    inputs: inputMap,
+    openAiKey: api.apiKey,
+    openAiEndpoint: api.endpointUrl
+  });
 
-    (async () => {
-      let total = "";
-      for await (let output of Rivet.getProcessorEvents(rivetProcessor.processor, {
-        partialOutputs: true
-      })) {
-        if (output.nodeId == runtime.graphData[graph].partialOutputNodeId) {
-          total += output.delta;
+  (async () => {
+    let total = "";
+    for await (let output of Rivet.getProcessorEvents(rivetProcessor.processor, {
+      partialOutputs: true
+    })) {
+      if (output.nodeId == runtime.graphData[graph].partialOutputNodeId) {
+        total += output.delta;
 
-          let outputs = Object.keys(runtime.graphData[graph].outputs);
-          let newRuntimeData = {}
+        let outputs = Object.keys(runtime.graphData[graph].outputs);
+        let newRuntimeData = {}
 
-          newRuntimeData[outputs[0]] = total;
-          updateRuntimeData(runtime, newRuntimeData)
-        }
-      }
-    })()
-
-    let result = await rivetProcessor.run();
-
-
-    status.graphs.splice(status.graphs.indexOf(graph), 1);
-
-    let outputMap = {};
-
-    for (let key in result) {
-      if (key.startsWith("json")) {
-        console.log("graphLogic.js JSON PARSE HIT");
-        try {
-          let resultJsonString = result.json.value;
-          let resultJson = JSON.parse(resultJsonString);
-          outputMap = { ...outputMap, ...resultJson };
-        } catch (e) {
-          console.error("Error parsing result json: ", e);
-        }
-      } else if (key != "cost") {
-        // filter out rivet reporting the cost of the query
-        outputMap[key] = result[key].value;
+        newRuntimeData[outputs[0]] = total;
+        updateRuntimeData(runtime, newRuntimeData)
       }
     }
+  })()
 
-    if (outputMap) {
-      // update the runtime data
-      updateRuntimeData(runtime, outputMap);
+  let result = await rivetProcessor.run();
+
+
+  status.graphs.splice(status.graphs.indexOf(graph), 1);
+
+  let outputMap = {};
+
+  for (let key in result) {
+    if (key.startsWith("json")) {
+      console.log("graphLogic.js JSON PARSE HIT");
+      try {
+        let resultJsonString = result.json.value;
+        let resultJson = JSON.parse(resultJsonString);
+        outputMap = { ...outputMap, ...resultJson };
+      } catch (e) {
+        console.error("Error parsing result json: ", e);
+      }
+    } else if (key != "cost") {
+      // filter out rivet reporting the cost of the query
+      outputMap[key] = result[key].value;
     }
+  }
+
+  if (outputMap) {
+    // update the runtime data
+    updateRuntimeData(runtime, outputMap);
   }
 }
 
