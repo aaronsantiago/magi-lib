@@ -167,7 +167,7 @@ export async function runGraphIndependent(runtime, graph, inputs) {
   Object.assign(fauxRuntime, runtime);
   fauxRuntime.runtimeData = inputs;
 
-  return await runGraph(runtime, graph);
+  return await runGraph(fauxRuntime, graph);
 }
 
 export async function runGraph(runtime, graph) {
