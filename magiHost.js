@@ -194,6 +194,11 @@ export async function runGraph(runtime, graph) {
     if (typeof inputMap[input] === "string") {
       type = "string";
     }
+    if (typeof inputMap[input] === "object") {
+      if (inputMap[input]?.mediaType?.startsWith("image")) {
+        type = "image";
+      }
+    }
     inputMap[input] = {
       type:type,
       value: inputMap[input]

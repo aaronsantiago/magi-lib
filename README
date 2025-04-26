@@ -17,10 +17,26 @@ basic setup:
 3. update the runtime with the project
 4. process the graphs
 
+FOR IMAGE INPUTS
+the runtimeData entry should be formatted as follows:
+
+```javascript
+{
+  runtimeData: {
+    mediaType: "image/png", // haven't tested with jpegs etc.
+    data: [image data as Uint8Array]
+  }
+}
+```
+
+Remember to change the type of the graph input to "image" as well.
+
 
 NOTE:
-when running in browser, build systems may complain about top-level await.
+when running in browser, build systems (AKA vite) may complain about top-level await.
 this is however only used in the node context, so you may want to configure your build system to ignore this.
+
+you'll also have to import fengari-web.js into the html file. see [magi-fe](https://github.com/aarondot/magi-fe) as an example.
 ```javascript
 
 export default defineConfig({
