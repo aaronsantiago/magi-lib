@@ -29,6 +29,15 @@ export function updateRuntime(runtime, newRuntime) {
   }
 }
 
+export async function runGraphIndependent(runtime, graph, inputs) {
+  if (runtime.host) {
+    return await magiHost.runGraphIndependent(runtime, graph, inputs);
+  }
+  else {
+    console.error("runGraphIndependent is not supported in client mode")
+  }
+}
+
 export async function runGraph(runtime, graph) {
   if (runtime.host) {
     await magiHost.runGraph(runtime, graph)

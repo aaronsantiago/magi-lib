@@ -162,6 +162,14 @@ function _addOrUpdateGraph(graph, graphData) {
   };
 }
 
+export async function runGraphIndependent(runtime, graph, inputs) {
+  let fauxRuntime = {};
+  Object.assign(fauxRuntime, runtime);
+  fauxRuntime.runtimeData = inputs;
+
+  return await runGraph(runtime, graph);
+}
+
 export async function runGraph(runtime, graph) {
   let { rivetProject, graphData, runtimeData, status, api } = runtime;
   let gd = graphData[graph];
@@ -243,6 +251,8 @@ export async function runGraph(runtime, graph) {
     // update the runtime data
     updateRuntimeData(runtime, outputMap);
   }
+
+  return outputMap;
 }
 
 export async function runScript(runtime, scriptName) {
