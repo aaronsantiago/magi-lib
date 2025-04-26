@@ -174,7 +174,6 @@ export async function runGraph(runtime, graph) {
   let { rivetProject, graphData, runtimeData, status, api } = runtime;
   let gd = graphData[graph];
   let inputMap = {};
-
   // collect inputs
   for (let input of Object.keys(gd.inputs)) {
     inputMap[input] = runtimeData[input];
@@ -191,14 +190,17 @@ export async function runGraph(runtime, graph) {
   }
 
   for (let input in inputMap) {
+    let type = "Any";
+    if (typeof inputMap[input] === "string") {
+      type = "string";
+    }
     inputMap[input] = {
-      type:"Any",
+      type:type,
       value: inputMap[input]
     }
   }
 
   // run the graph
-  console.log("running graph: ", graph, inputMap, api);
   status.graphs.push(graph);
   let rivetProcessor = Rivet.coreCreateProcessor(rivetProject, {
     graph: graph,
@@ -230,7 +232,6 @@ export async function runGraph(runtime, graph) {
   status.graphs.splice(status.graphs.indexOf(graph), 1);
 
   let outputMap = {};
-
   for (let key in result) {
     if (key.startsWith("json")) {
       console.log("graphLogic.js JSON PARSE HIT");
